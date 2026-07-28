@@ -1,0 +1,9 @@
+flask
+groq
+python-dotenv
+pypdf
+python-docx
+python-pptx
+reportlab
+werkzeug
+gunicorn

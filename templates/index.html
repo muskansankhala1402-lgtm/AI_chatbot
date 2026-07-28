@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nova</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="light">
+
+<div class="app">
+    <div class="sidebar">
+        <button id="new-chat-btn">+ New Chat</button>
+        <div class="history-list" id="history-list"></div>
+
+        <button id="theme-toggle">🌙 Dark Mode</button>
+
+        <div class="profile-bar" id="profile-bar">
+            <div class="profile-icon">{{ username[0]|upper }}</div>
+            <span>{{ username }}</span>
+        </div>
+        <div class="profile-popup" id="profile-popup">
+            <p><strong>{{ username }}</strong></p>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="main">
+
+        <!-- NEW: Empty state welcome screen -->
+        <div class="welcome-screen" id="welcome-screen">
+            <div class="welcome-emoji">✨</div>
+            <h1 id="greeting-text">Hello, {{ username }}</h1>
+            <p class="welcome-sub">How can I help you today?</p>
+
+            <div class="welcome-input-box">
+                <button id="welcome-plus-btn">+</button>
+                <input type="text" id="welcome-input" placeholder="Message Nova..." autocomplete="off">
+                <button id="welcome-send-btn">Send</button>
+            </div>
+        </div>
+
+        <div class="chat-box" id="chat-box" style="display:none"></div>
+
+        <div class="chat-input" id="chat-input-bar" style="display:none">
+            <div class="attach-wrapper">
+                <button id="plus-btn">+</button>
+                <div class="attach-menu" id="attach-menu">
+                    <div class="attach-option" id="opt-image">🖼️ Image</div>
+                    <div class="attach-option" id="opt-file">📄 File</div>
+                    <div class="attach-option" id="opt-doc">🗂️ Generate Document</div>
+                </div>
+            </div>
+            <input type="file" id="image-input" accept="image/*" style="display:none">
+            <input type="file" id="file-input" accept=".pdf,.docx,.txt" style="display:none">
+
+            <div id="preview-bar" class="preview-bar" style="display:none">
+                <span id="preview-name"></span>
+                <button id="preview-remove">✕</button>
+            </div>
+
+            <input type="text" id="user-input" placeholder="Message Nova..." autocomplete="off">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<div id="doc-modal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+        <h3>Generate Document</h3>
+        <select id="doc-type">
+            <option value="ppt">PowerPoint (PPT)</option>
+            <option value="docx">Word Document</option>
+            <option value="pdf">PDF</option>
+        </select>
+        <textarea id="doc-topic" placeholder="Kya banana hai bata do (e.g. 'Presentation on climate change')"></textarea>
+        <div class="modal-actions">
+            <button id="doc-cancel">Cancel</button>
+            <button id="doc-generate">Generate</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const chatBox = document.getElementById("chat-box");
+const userInput = document.getElementById("user-input");
+const sendBtn = document.getElementById("send-btn");
+const historyList = document.getElementById("history-list");
+const newChatBtn = document.getElementById("new-chat-btn");
+const themeToggle = document.getElementById("theme-toggle");
+const plusBtn = document.getElementById("plus-btn");
+const attachMenu = document.getElementById("attach-menu");
+const imageInput = document.getElementById("image-input");
+const fileInput = document.getElementById("file-input");
+const welcomeScreen = document.getElementById("welcome-screen");
+const chatInputBar = document.getElementById("chat-input-bar");
+const welcomeInput = document.getElementById("welcome-input");
+const welcomeSendBtn = document.getElementById("welcome-send-btn");
+const welcomePlusBtn = document.getElementById("welcome-plus-btn");
+
+let pendingFile = null;
+let pendingType = null;
+
+// NEW — time-based greeting
+function setGreeting() {
+    const hour = new Date().getHours();
+    let greet = "Hello";
+    if (hour < 12) greet = "Good morning";
+    else if (hour < 17) greet = "Good afternoon";
+    else greet = "Good evening";
+    document.getElementById("greeting-text").textContent = `${greet}, {{ username }}`;
+}
+setGreeting();
+
+// NEW — switches from welcome screen to normal chat view
+function showChatView() {
+    welcomeScreen.style.display = "none";
+    chatBox.style.display = "flex";
+    chatInputBar.style.display = "flex";
+}
+function showWelcomeView() {
+    welcomeScreen.style.display = "flex";
+    chatBox.style.display = "none";
+    chatInputBar.style.display = "none";
+    chatBox.innerHTML = "";
+}
+
+function addMessage(text, sender) {
+    if (sender === "bot") {
+        const chunks = text.split(/\n\s*\n/).filter(c => c.trim() !== "");
+        chunks.forEach((chunk, i) => {
+            setTimeout(() => {
+                const msg = document.createElement("div");
+                msg.classList.add("message", "bot-message");
+                msg.textContent = chunk.trim();
+                chatBox.appendChild(msg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, i * 400);
+        });
+    } else {
+        const msg = document.createElement("div");
+        msg.classList.add("message", "user-message");
+        msg.textContent = text;
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+}
+
+function showTyping(text) {
+    const typing = document.createElement("div");
+    typing.classList.add("message", "bot-message");
+    typing.id = "typing";
+    typing.textContent = text;
+    chatBox.appendChild(typing);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function loadHistory() {
+    const res = await fetch("/history");
+    const data = await res.json();
+    historyList.innerHTML = "";
+    data.history.forEach(item => {
+        const div = document.createElement("div");
+        div.classList.add("history-item");
+        div.textContent = item.title;
+        div.dataset.id = item.id;
+        if (item.id === data.current_id) div.classList.add("active");
+        div.addEventListener("click", () => loadChat(item.id));
+        historyList.appendChild(div);
+    });
+}
+
+async function loadChat(convId) {
+    const res = await fetch(`/load_chat/${convId}`);
+    const data = await res.json();
+    chatBox.innerHTML = "";
+    if (data.messages.length === 0) {
+        showWelcomeView();
+    } else {
+        showChatView();
+        data.messages.forEach(m => {
+            const msg = document.createElement("div");
+            msg.classList.add("message", m.role === "user" ? "user-message" : "bot-message");
+            msg.textContent = m.content;
+            chatBox.appendChild(msg);
+        });
+    }
+    loadHistory();
+}
+
+function setPending(file, type) {
+    pendingFile = file;
+    pendingType = type;
+    document.getElementById("preview-name").textContent =
+        (type === "image" ? "🖼️ " : "📄 ") + file.name;
+    document.getElementById("preview-bar").style.display = "flex";
+}
+
+imageInput.addEventListener("change", () => {
+    if (imageInput.files[0]) setPending(imageInput.files[0], "image");
+});
+fileInput.addEventListener("change", () => {
+    if (fileInput.files[0]) setPending(fileInput.files[0], "file");
+});
+
+document.getElementById("preview-remove").addEventListener("click", () => {
+    pendingFile = null;
+    pendingType = null;
+    document.getElementById("preview-bar").style.display = "none";
+    imageInput.value = "";
+    fileInput.value = "";
+});
+
+async function sendMessage(initialText) {
+    const text = (initialText !== undefined ? initialText : userInput.value.trim());
+    if (!pendingFile && text === "") return;
+
+    showChatView(); // switch out of welcome screen on first message
+
+    if (pendingFile) {
+        addMessage(`${pendingType === "image" ? "📷" : "📄"} ${pendingFile.name}${text ? " — " + text : ""}`, "user");
+        showTyping(pendingType === "image" ? "Nova is looking at the image..." : "Nova is reading the file...");
+
+        const formData = new FormData();
+        formData.append(pendingType, pendingFile);
+        formData.append("message", text || "What's in this?");
+
+        const url = pendingType === "image" ? "/upload_image" : "/upload_file";
+        const response = await fetch(url, { method: "POST", body: formData });
+        const data = await response.json();
+        document.getElementById("typing").remove();
+        addMessage(data.reply, "bot");
+        loadHistory();
+
+        pendingFile = null;
+        pendingType = null;
+        document.getElementById("preview-bar").style.display = "none";
+        imageInput.value = "";
+        fileInput.value = "";
+        userInput.value = "";
+        welcomeInput.value = "";
+        return;
+    }
+
+    addMessage(text, "user");
+    userInput.value = "";
+    welcomeInput.value = "";
+    showTyping("Nova is typing...");
+
+    const response = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+    });
+    const data = await response.json();
+    document.getElementById("typing").remove();
+    addMessage(data.reply, "bot");
+    loadHistory();
+}
+
+// welcome screen input handlers
+welcomeSendBtn.addEventListener("click", () => sendMessage(welcomeInput.value.trim()));
+welcomeInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(welcomeInput.value.trim()); });
+welcomePlusBtn.addEventListener("click", () => {
+    showChatView();
+    attachMenu.classList.toggle("show");
+});
+
+plusBtn.addEventListener("click", () => attachMenu.classList.toggle("show"));
+
+document.getElementById("opt-image").addEventListener("click", () => {
+    attachMenu.classList.remove("show");
+    imageInput.click();
+});
+document.getElementById("opt-file").addEventListener("click", () => {
+    attachMenu.classList.remove("show");
+    fileInput.click();
+});
+document.getElementById("opt-doc").addEventListener("click", () => {
+    attachMenu.classList.remove("show");
+    document.getElementById("doc-modal").style.display = "flex";
+});
+document.getElementById("doc-cancel").addEventListener("click", () => {
+    document.getElementById("doc-modal").style.display = "none";
+});
+document.getElementById("doc-generate").addEventListener("click", async () => {
+    const type = document.getElementById("doc-type").value;
+    const topic = document.getElementById("doc-topic").value.trim();
+    if (!topic) return;
+    document.getElementById("doc-modal").style.display = "none";
+    showChatView();
+
+    addMessage(`🗂️ Generate ${type.toUpperCase()}: ${topic}`, "user");
+    showTyping("Nova is creating your document...");
+
+    const response = await fetch("/generate_document", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, topic })
+    });
+    const data = await response.json();
+    document.getElementById("typing").remove();
+    addMessage(data.reply, "bot");
+
+    if (data.download_url) {
+        const link = document.createElement("a");
+        link.href = data.download_url;
+        link.textContent = "⬇️ Download file";
+        link.classList.add("message", "bot-message", "download-link");
+        link.target = "_blank";
+        chatBox.appendChild(link);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    document.getElementById("doc-topic").value = "";
+    loadHistory();
+});
+
+document.getElementById("profile-bar").addEventListener("click", () => {
+    document.getElementById("profile-popup").classList.toggle("show");
+});
+
+newChatBtn.addEventListener("click", async () => {
+    await fetch("/new_chat", { method: "POST" });
+    showWelcomeView();
+    loadHistory();
+});
+
+themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    document.body.classList.toggle("light");
+    const isDark = document.body.classList.contains("dark");
+    themeToggle.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+});
+
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.remove("light");
+    document.body.classList.add("dark");
+    themeToggle.textContent = "☀️ Light Mode";
+}
+
+sendBtn.addEventListener("click", () => sendMessage());
+userInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+
+// on page load, check if current chat has messages or is empty
+async function init() {
+    await loadHistory();
+    const res = await fetch("/history");
+    const data = await res.json();
+    if (data.current_id) {
+        loadChat(data.current_id);
+    }
+}
+init();
+</script>
+
+</body>
+</html>
