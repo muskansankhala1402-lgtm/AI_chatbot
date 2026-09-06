@@ -1,22 +1,47 @@
-<h1 align="center">Hi 👋, I'm Muskan Sankhala</h1>
-<h3 align="center">A passionate full stack developer from India</h3>
+# 🤖 AI Chatbot
 
-- 🌱 I’m currently learning **AI,ML**
+An interactive **AI Chatbot** designed to communicate with users and provide intelligent responses to their queries. The project demonstrates the use of AI concepts to create a simple and user-friendly conversational application.
 
-- 👨‍💻 All of my projects are available at [https://github.com/muskansankhala1402-lgtm/Muskan_projects](https://github.com/muskansankhala1402-lgtm/Muskan_projects)
+## ✨ Features
 
-- 📫 How to reach me **muskansankhala1402@gmail.com**
+* 💬 Interactive chat interface
+* 🤖 AI-powered responses
+* ⚡ Real-time conversation
+* 🧹 Clear and simple user interface
+* 📱 User-friendly design
 
-- 📄 Know about my experiences [https://drive.google.com/file/d/1FS6LYlkZyRIRn_pgIfIgbpB5nnGNS1A7/view?usp=drive_link](https://drive.google.com/file/d/1FS6LYlkZyRIRn_pgIfIgbpB5nnGNS1A7/view?usp=drive_link)
+## 🛠️ Technologies Used
 
-<h3 align="left">Connect with me:</h3>
-<p align="left">
-<a href="https://linkedin.com/in/https://www.linkedin.com/in/muskan-sankhala-742741332?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="https://www.linkedin.com/in/muskan-sankhala-742741332?utm_source=share_via&utm_content=profile&utm_medium=member_android" height="30" width="40" /></a>
-<a href="https://kaggle.com/muskansankhala" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/kaggle.svg" alt="muskansankhala" height="30" width="40" /></a>
-<a href="https://www.hackerrank.com/muskansankhala11" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/hackerrank.svg" alt="muskansankhala11" height="30" width="40" /></a>
-<a href="https://www.leetcode.com/muskansankhala_14" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/leet-code.svg" alt="muskansankhala_14" height="30" width="40" /></a>
-<a href="https://auth.geeksforgeeks.org/user/muskansankhala14" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/geeks-for-geeks.svg" alt="muskansankhala14" height="30" width="40" /></a>
-</p>
+* **Frontend:** HTML, CSS, JavaScript
+* **AI:** AI/Chatbot API
+* **Development:** VS Code
+* **Version Control:** Git & GitHub
 
-<h3 align="left">Languages and Tools:</h3>
-<p align="left"> <a href="https://www.cprogramming.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/c/c-original.svg" alt="c" width="40" height="40"/> </a> <a href="https://canvasjs.com" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/Hardik0307/Hardik0307/master/assets/canvasjs-charts.svg" alt="canvasjs" width="40" height="40"/> </a> <a href="https://www.w3schools.com/cpp/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/cplusplus/cplusplus-original.svg" alt="cplusplus" width="40" height="40"/> </a> <a href="https://www.w3schools.com/cs/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/csharp/csharp-original.svg" alt="csharp" width="40" height="40"/> </a> <a href="https://www.w3schools.com/css/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" alt="css3" width="40" height="40"/> </a> <a href="https://www.figma.com/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/figma/figma-icon.svg" alt="figma" width="40" height="40"/> </a> <a href="https://www.w3.org/html/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" alt="html5" width="40" height="40"/> </a> <a href="https://www.java.com" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/java/java-original.svg" alt="java" width="40" height="40"/> </a> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="40" height="40"/> </a> <a href="https://www.mysql.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mysql/mysql-original-wordmark.svg" alt="mysql" width="40" height="40"/> </a> <a href="https://nodejs.org" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original-wordmark.svg" alt="nodejs" width="40" height="40"/> </a> <a href="https://www.python.org" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="40" height="40"/> </a> <a href="https://reactjs.org/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original-wordmark.svg" alt="react" width="40" height="40"/> </a> </p>
+## 📂 Project Structure
+
+```text
+AI-Chatbot/
+│
+├── index.html
+├── style.css
+├── script.js
+└── README.md
+```
+
+## 🚀 How to Run
+
+1. Clone the repository.
+2. Open the project folder in VS Code.
+3. Configure your AI API key if required.
+4. Run the project using Live Server or your preferred development server.
+5. Start chatting with the AI chatbot.
+
+## 🎯 Purpose
+
+The main purpose of this project is to build a conversational AI application and gain practical experience with **web development, API integration, and AI-based interactions**.
+
+## 👩‍💻 Author
+
+**Muskan Sankhala**
+
+[GitHub](https://github.com/muskansankhala1402-lgtm)
